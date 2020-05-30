@@ -1,20 +1,35 @@
 const { typeDefs, resolvers } = require("./graphql/index");
 const { ApolloServer } = require("apollo-server-express");
+const { createServer } = require("http");
+
+const app = require("express")();
+const PORT = process.env.PORT || 8080;
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  subscriptions: {
+    onConnect: () => {
+      console.log("coneected");
+    },
+    onDisconnect: () => {
+      console.log("disconected");
+    },
+  },
 });
 
 // Initialize the app
-const app = require("express")();
 server.applyMiddleware({ app });
 
-const PORT = process.env.PORT || 8080;
+const httpServer = createServer(app);
+server.installSubscriptionHandlers(httpServer);
 
-// Start the server
-app.listen(PORT, () => {
+// Wrap the Express server
+httpServer.listen(PORT, () => {
   console.log(
-    `Go to http://localhost:${PORT}${server.graphqlPath} to run queries!`
+    `🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`
+  );
+  console.log(
+    `🚀 Subscriptions ready at ws://localhost:${PORT}${server.subscriptionsPath}`
   );
 });

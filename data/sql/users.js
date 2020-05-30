@@ -23,7 +23,7 @@ const signup = (user) => {
 
 const signin = (userReq) => {
   let user;
-  return findUser(userReq)
+  return findUser(userReq.usr)
     .then((foundUser) => {
       user = foundUser;
       return checkPassword(userReq.password, foundUser);
@@ -100,13 +100,15 @@ const updateUserToken = (token, user) => {
     .then((data) => data.rows[0]);
 };
 
-const findUser = (userReq) => {
+const findUser = (usr) => {
+  console.log(usr);
   return db
-    .raw("SELECT * FROM users WHERE usr = ?", [userReq.usr])
+    .raw("SELECT * FROM users WHERE usr = ?", [usr])
     .then((data) => data.rows[0]);
 };
 
 module.exports = {
   signin,
   signup,
+  findUser,
 };
